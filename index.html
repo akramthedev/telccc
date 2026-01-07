@@ -147,13 +147,15 @@ function save() {
     localStorage.setItem('lesenExams', JSON.stringify(exams))
 }
 
+
+
 function render() {
     const tbody = document.getElementById('tbody')
     tbody.innerHTML = ''
     exams.forEach((exam, i) => {
         const tr = document.createElement('tr')
         tr.innerHTML = `
-            <td>Exam ${i + 1}</td>
+            <td class="editable" onclick="openModal(${i}, 'title')">${exam.title || 'Click to add title'}</td>
             ${exam.parts.map((p, j) =>
                 `<td class="editable" onclick="openModal(${i},${j})">${p || 'Click to add'}</td>`
             ).join('')}
@@ -162,33 +164,38 @@ function render() {
     })
 }
 
+
+
+
 function addExam() {
     exams.push({ parts: ['', '', ''] })
     save()
     render()
 }
 
-function openModal(ei, pi) {
-    active = { ei, pi }
-    document.getElementById('titleInput').value = exams[ei].parts[pi]
-    document.getElementById('modal').style.display = 'flex'
-}
+ 
 
 function closeModal() {
     document.getElementById('modal').style.display = 'none'
     active = null
 }
+function openModal(ei, pi) {
+    active = { ei, pi }
+    const value = (pi === 'title') ? exams[ei].title : exams[ei].parts[pi]
+    document.getElementById('titleInput').value = value
+    document.getElementById('modal').style.display = 'flex'
+}
 
 function saveTitle() {
     const v = document.getElementById('titleInput').value.trim()
     if (active) {
-        exams[active.ei].parts[active.pi] = v
+        if (active.pi === 'title') exams[active.ei].title = v
+        else exams[active.ei].parts[active.pi] = v
         save()
         render()
     }
     closeModal()
 }
-
 render()
 </script>
 
