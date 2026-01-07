@@ -61,6 +61,7 @@ td.editable:hover {
 .modal-content input {
     width: 100%;
     padding: 10px;
+    margin-top: 10px;
 }
 .modal-actions {
     margin-top: 15px;
@@ -79,7 +80,7 @@ td.editable:hover {
 <table>
     <thead>
         <tr>
-            <th>Exam Title</th>
+            <th>Exam</th>
             <th>Lesen Part 1</th>
             <th>Lesen Part 2</th>
             <th>Lesen Part 3</th>
@@ -90,7 +91,7 @@ td.editable:hover {
 
 <div class="modal" id="modal">
     <div class="modal-content">
-        <input id="titleInput" placeholder="Enter title">
+        <input id="titleInput" placeholder="Enter task title">
         <div class="modal-actions">
             <button onclick="closeModal()">Cancel</button>
             <button onclick="saveTitle()">Save</button>
@@ -99,8 +100,48 @@ td.editable:hover {
 </div>
 
 <script>
+
+
+
+    const examsRecovery = [
+  { title: "Bee", parts: ["wie aus Tieren", "Melanie Hoffmann", "Sie suchen Informationen zu den gesundheitlichen Auswirkungen von Sport."] },
+  { title: "Benzin", parts: ["Benzingeld sparen", "Korbjagd zu Pferde", "Ein Kollege hat seit ein paar Tagen Hautprobleme"] },
+  { title: "Bilder", parts: ["Bilder einer", "Gesundes Essen", "Sie möchten einen Ganztagesausflu"] },
+  { title: "Drogen 1", parts: ["Doping für Drogenspürhunde", "Wer parkt, muss zahlen", "hre Schwägerin erwartet ein Kind. Sie ist nicht sicher,"] },
+  { title: "Drogen 2", parts: ["Doping für Drogenspürhunde", "Volkskrankenheit Rückenschmerzen", "Eine Kollegin kann ihren Arbeitsbereicht nicht gut strukturieren"] },
+  { title: "Grundschule", parts: ["An deutschen Grundschulen", "Geschichte des Hauspersonals", "Sie möchten Ihren Eltern zur Silberhochzeit"] },
+  { title: "Impfung", parts: ["Who gibt neue Impf..", "Wie unsere Kaufentscheidungen", "Ihre Schwägerin erwartet ein Kind"] },
+  { title: "Insekten", parts: ["neue Insekten in Frankreich", "Kredikkarten fur Jugendlichen", "Sie suchen eine Au-Pair Madchen"] },
+  { title: "Inseln", parts: ["eutscher Forscher startet Expedition", "Wer parkt, muss zahlen", "Ein Bekannter möchte alte Romane verschenken."] },
+  { title: "Kaffee", parts: ["Altes Handwerk und alte Technik", "Mehrsprachige Erziehung", "Eine Bekannte ist schwanger und sucht Informationen,"] },
+  { title: "Kartofeln", parts: ["Das ideale Gemüse für schwer Arbeitende", "Ein Leben für den Kaffeе", "Ein Bekannter möchte miterleben, wie spektakuläre Filmszenen gedreht"] },
+  { title: "Kelner", parts: ["Jugend forscht auch am Meer", "Noch ein Wasser.......Kellnern war gestern", "Sie brauchen Unterstützung in Mathematik"] },
+  { title: "Licht", parts: ["Der Wald als neues Zuhause", "Der Puppenmacher", "Alle Ihre Schränke sind voll mit Sachen und Sie haben"] },
+  { title: "Limonade", parts: ["Limo aus dem Wasserhand", "Krista, der tierische Star", "Ein Bekannter spielt Gitarre"] },
+  { title: "Ostereich", parts: ["Erneuerungskur für einen alten Mark", "Österreich", "Eine Bekannte interessiert sich für Bücher über den Tennissport"] },
+  { title: "Programmer 1", parts: ["Immer mehr Jugendliche", "Verpackungen im Supermarkt: G", "Ein Bekannter möchte einen Film sehen, der nach dem Werk"] },
+  { title: "Programmer 2", parts: ["Immer mehr Jugendliche", "Familienglück oder Generationskonflikte?", "Ihre Schwägerin erwartet ein Kind."] },
+  { title: "Programmer 3", parts: ["Immer mehr Jugendliche", "Krista, der tierische Star", "Ein Freund von Ihnen möchte gerne bei einer Sportveranstaltung mitarbeiten"] },
+  { title: "Schlafzug", parts: ["Im Winter gehen viele Tiere", "Eine Dame aus Berlin vergleicht", "UNDEFINED"] },
+  { title: "Spiele 1", parts: ["Alte spiele stärken", "Müdigkeit und juckende Augen", "Einem Bekannten wurde die Arbeitsstelle gekündigt."] },
+  { title: "Spiele 2", parts: ["Alte spiele stärken", "Österreich", "Eine bekannter möchte mit seiner zehnjährigen Tochter eine"] },
+  { title: "Sport", parts: ["Sport ist gesund", "Ein Leben für den Kaffee", "Ihre Schwester interessiert sich für die Biographien großer Musiker."] },
+  { title: "TanzKurs 1", parts: ["Freiplatzen am TanzKurs", "Kreditkarten für Jugendliche", "Ein Bekannter spielt Gitarre und möchte ein weiteres"] },
+  { title: "TanzKurs 2", parts: ["Freiplatzen am TanzKurs", "Melanie Hoffmann", "Ein Bekannter möchte einen Film sehen, der nach dem Werk"] },
+  { title: "Trampoline", parts: ["Viele Trampoline haben", "Der Puppenmacher", "Sie wollen mit Ihren Kindern eine etwas andere, eher lustige Seite von Weihnachten erleben."] },
+  { title: "Umwelt", parts: ["Gemeinsam kaputte Geräte", "Der Puppenmache", "Ein Bekannter interessiert sich für Tierdokumentationen"] },
+  { title: "Phone", parts: ["Neue Kinderhandys auf den Markt", "Wie zwei US", "Sie möchten sich einen Dokumentarfilm über die Einwanderung nach Australien un"] }
+];
+
+
+
 let exams = JSON.parse(localStorage.getItem('lesenExams')) || []
+if (exams.length === 0) {
+  exams = examsRecovery.map(e => ({ title: e.title, parts: e.parts.slice() }))
+  localStorage.setItem('lesenExams', JSON.stringify(exams))
+}
 let active = null
+
 
 function save() {
     localStorage.setItem('lesenExams', JSON.stringify(exams))
@@ -112,9 +153,9 @@ function render() {
     exams.forEach((exam, i) => {
         const tr = document.createElement('tr')
         tr.innerHTML = `
-            <td class="editable" onclick="openModal('exam',${i})">${exam.title}</td>
+            <td>Exam ${i + 1}</td>
             ${exam.parts.map((p, j) =>
-                `<td class="editable" onclick="openModal('part',${i},${j})">${p || 'Click to add'}</td>`
+                `<td class="editable" onclick="openModal(${i},${j})">${p || 'Click to add'}</td>`
             ).join('')}
         `
         tbody.appendChild(tr)
@@ -122,15 +163,14 @@ function render() {
 }
 
 function addExam() {
-    exams.push({ title: 'Click to rename exam', parts: ['', '', ''] })
+    exams.push({ parts: ['', '', ''] })
     save()
     render()
 }
 
-function openModal(type, ei, pi) {
-    active = { type, ei, pi }
-    document.getElementById('titleInput').value =
-        type === 'exam' ? exams[ei].title : exams[ei].parts[pi]
+function openModal(ei, pi) {
+    active = { ei, pi }
+    document.getElementById('titleInput').value = exams[ei].parts[pi]
     document.getElementById('modal').style.display = 'flex'
 }
 
@@ -141,12 +181,8 @@ function closeModal() {
 
 function saveTitle() {
     const v = document.getElementById('titleInput').value.trim()
-    if (active && v) {
-        if (active.type === 'exam') {
-            exams[active.ei].title = v
-        } else {
-            exams[active.ei].parts[active.pi] = v
-        }
+    if (active) {
+        exams[active.ei].parts[active.pi] = v
         save()
         render()
     }
