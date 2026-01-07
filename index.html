@@ -61,7 +61,6 @@ td.editable:hover {
 .modal-content input {
     width: 100%;
     padding: 10px;
-    margin-top: 10px;
 }
 .modal-actions {
     margin-top: 15px;
@@ -80,7 +79,7 @@ td.editable:hover {
 <table>
     <thead>
         <tr>
-            <th>Exam</th>
+            <th>Exam Title</th>
             <th>Lesen Part 1</th>
             <th>Lesen Part 2</th>
             <th>Lesen Part 3</th>
@@ -91,7 +90,7 @@ td.editable:hover {
 
 <div class="modal" id="modal">
     <div class="modal-content">
-        <input id="titleInput" placeholder="Enter task title">
+        <input id="titleInput" placeholder="Enter title">
         <div class="modal-actions">
             <button onclick="closeModal()">Cancel</button>
             <button onclick="saveTitle()">Save</button>
@@ -113,9 +112,9 @@ function render() {
     exams.forEach((exam, i) => {
         const tr = document.createElement('tr')
         tr.innerHTML = `
-            <td>Exam ${i + 1}</td>
+            <td class="editable" onclick="openModal('exam',${i})">${exam.title}</td>
             ${exam.parts.map((p, j) =>
-                `<td class="editable" onclick="openModal(${i},${j})">${p || 'Click to add'}</td>`
+                `<td class="editable" onclick="openModal('part',${i},${j})">${p || 'Click to add'}</td>`
             ).join('')}
         `
         tbody.appendChild(tr)
@@ -123,14 +122,15 @@ function render() {
 }
 
 function addExam() {
-    exams.push({ parts: ['', '', ''] })
+    exams.push({ title: 'Click to rename exam', parts: ['', '', ''] })
     save()
     render()
 }
 
-function openModal(ei, pi) {
-    active = { ei, pi }
-    document.getElementById('titleInput').value = exams[ei].parts[pi]
+function openModal(type, ei, pi) {
+    active = { type, ei, pi }
+    document.getElementById('titleInput').value =
+        type === 'exam' ? exams[ei].title : exams[ei].parts[pi]
     document.getElementById('modal').style.display = 'flex'
 }
 
@@ -141,8 +141,12 @@ function closeModal() {
 
 function saveTitle() {
     const v = document.getElementById('titleInput').value.trim()
-    if (active) {
-        exams[active.ei].parts[active.pi] = v
+    if (active && v) {
+        if (active.type === 'exam') {
+            exams[active.ei].title = v
+        } else {
+            exams[active.ei].parts[active.pi] = v
+        }
         save()
         render()
     }
