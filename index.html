@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lesen Exams Tracker</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+}
+h1 {
+    margin-bottom: 10px;
+}
+button {
+    padding: 8px 14px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover {
+    background: #1e4ed8;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+th {
+    background: #eef2ff;
+}
+td.editable {
+    cursor: pointer;
+    color: #2563eb;
+}
+td.editable:hover {
+    background: #f1f5ff;
+}
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background: white;
+    padding: 20px;
+    width: 350px;
+    border-radius: 10px;
+}
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+.modal-actions {
+    margin-top: 15px;
+    text-align: right;
+}
+.modal-actions button {
+    margin-left: 8px;
+}
+</style>
+</head>
+<body>
+
+<h1>Lesen Exams – Titles Tracker</h1>
+<button onclick="addExam()">Add Exam</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Exam</th>
+            <th>Lesen Part 1</th>
+            <th>Lesen Part 2</th>
+            <th>Lesen Part 3</th>
+        </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+</table>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <input id="titleInput" placeholder="Enter task title">
+        <div class="modal-actions">
+            <button onclick="closeModal()">Cancel</button>
+            <button onclick="saveTitle()">Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let exams = JSON.parse(localStorage.getItem('lesenExams')) || []
+let active = null
+
+function save() {
+    localStorage.setItem('lesenExams', JSON.stringify(exams))
+}
+
+function render() {
+    const tbody = document.getElementById('tbody')
+    tbody.innerHTML = ''
+    exams.forEach((exam, i) => {
+        const tr = document.createElement('tr')
+        tr.innerHTML = `
+            <td>Exam ${i + 1}</td>
+            ${exam.parts.map((p, j) =>
+                `<td class="editable" onclick="openModal(${i},${j})">${p || 'Click to add'}</td>`
+            ).join('')}
+        `
+        tbody.appendChild(tr)
+    })
+}
+
+function addExam() {
+    exams.push({ parts: ['', '', ''] })
+    save()
+    render()
+}
+
+function openModal(ei, pi) {
+    active = { ei, pi }
+    document.getElementById('titleInput').value = exams[ei].parts[pi]
+    document.getElementById('modal').style.display = 'flex'
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none'
+    active = null
+}
+
+function saveTitle() {
+    const v = document.getElementById('titleInput').value.trim()
+    if (active) {
+        exams[active.ei].parts[active.pi] = v
+        save()
+        render()
+    }
+    closeModal()
+}
+
+render()
+</script>
+
+</body>
+</html>
